@@ -16,6 +16,13 @@ const checkOnHTTPServer = () => {
     });
     workers.httpServer.on('message', (message) => {
       console.log('master recieved message from http server', message);
+      if (message.task === 'compress') {
+        workers.imageWorker.send(message);
+      } else if (message.task === 'upload') {
+
+      } else if (message.task === 'verify') {
+        
+      }
     });
   }
 };
@@ -50,8 +57,7 @@ const masterJob = () => {
 if (cluster.isMaster) {
   masterJob();
 } else if (process.env.ROLE === 'http server') {
-  const httpServer = require('./httpServer/server.js');
+  require('./httpServer/server.js');
 } else if (process.env.ROLE === 'image worker') {
-  const imageWorker = require('./imageWorker/worker.js');
-  imageWorker.workerJob();
+  require('./imageWorker/worker.js');
 }
