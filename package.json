@@ -27,7 +27,8 @@
     "imagemin-pngquant": "^5.0.0",
     "mime": "^1.3.4",
     "multer": "^1.1.0",
-    "nodemon": "^1.9.2"
+    "nodemon": "^1.9.2",
+    "superagent": "^2.0.0"
   },
   "devDependencies": {
     "eslint": "^2.13.0",
