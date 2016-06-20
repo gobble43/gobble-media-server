@@ -18,7 +18,7 @@ const checkOnHTTPServer = () => {
       console.log('master recieved message from http server', message);
     });
   }
-}
+};
 const checkOnImageWorker = () => {
   if (workers.imageWorker === undefined) {
     console.log('master starting an image worker');
@@ -35,7 +35,7 @@ const checkOnImageWorker = () => {
       console.log('master recieved message from image worker', message);
     });
   }
-}
+};
 const masterJob = () => {
   console.log('master job started');
 
@@ -45,7 +45,7 @@ const masterJob = () => {
   };
 
   setInterval(masterLoop, 2000);
-}
+};
 
 if (cluster.isMaster) {
   masterJob();
