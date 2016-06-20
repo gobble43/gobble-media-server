@@ -9,15 +9,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/gobble43/gobble-media-server.git"
+    "url": "git+https://github.com/leoadelstein/gobble-media-server.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/gobble43/gobble-media-server/issues"
+    "url": "https://github.com/leoadelstein/gobble-media-server/issues"
   },
-  "homepage": "https://github.com/gobble43/gobble-media-server#readme",
+  "homepage": "https://github.com/leoadelstein/gobble-media-server#readme",
   "dependencies": {
     "body-parser": "^1.15.1",
     "crypto": "0.0.3",
