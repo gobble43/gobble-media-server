@@ -1,0 +1,27 @@
+{
+  "name": "gobble-media-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gobble43/gobble-media-server.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/gobble43/gobble-media-server/issues"
+  },
+  "homepage": "https://github.com/gobble43/gobble-media-server#readme",
+  "dependencies": {
+    "body-parser": "^1.15.1",
+    "crypto": "0.0.3",
+    "express": "^4.14.0",
+    "mime": "^1.3.4",
+    "multer": "^1.1.0"
+  }
+}
