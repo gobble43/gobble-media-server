@@ -1,6 +1,8 @@
 const path = require('path');
 
-const redis = require('redis');
+const Promise = require('bluebird');
+
+const redis = Promise.promisifyAll(require('redis'));
 const redisClient = redis.createClient();
 
 const imagemin = require('imagemin');
@@ -9,13 +11,12 @@ const imageminPngquant = require('imagemin-pngquant');
 
 // const request = require('superagent');
 
-
-const processImages = (picture, callback) => {
+const compressImage = (pictureName, callback) => {
   var imagePath;
-  if (picture.indexOf('openfoodfacts.org') !== -1) {
-    imagePath = picture;
+  if (pictureName.indexOf('openfoodfacts.org') !== -1) {
+    imagePath = pictureName;
   } else {
-    imagePath = path.join(`${__dirname}../../../dist/images/${picture}`);
+    imagePath = path.join(`${__dirname}../../../dist/images/${pictureName}`);
   }
   console.log('imagePath: ', imagePath);
 
@@ -24,7 +25,7 @@ const processImages = (picture, callback) => {
   imageminPngquant({ quality: '65-80' })] })
   .then((files) => {
     console.log(files);
-    callback(null, files[0].path);
+    callback(null, pictureName);
   })
   .catch((err) => {
     console.log(err);
@@ -32,38 +33,49 @@ const processImages = (picture, callback) => {
   });
 };
 
+const compressImageAsync = Promise.promisify(compressImage);
+
 const workerJob = () => {
   process.on('message', (message) => {
     console.log('recieved message from the master', message);
   });
 
   const workerLoop = () => {
-    redisClient.llen('compress', (err, length) => {
-      if (length === 0) {
-        setTimeout(workerLoop, 1000);
-      } else {
-        redisClient.rpop('compress', (err, taskString) => {
-          process.send('processing an image: ' + taskString);
-          const task = JSON.parse(taskString);
-          processImages(task.imageUrl, (err, imagePath) => {
-            if (err) {
+    redisClient.llenAsync('compress')
+      .then((length) => {
+        console.log('length', length);
+        if (length === 0) {
+          setTimeout(workerLoop, 1000);
+        } else {
+          redisClient.rpopAsync('compress')
+            .then((taskString) => {
+              console.log(taskString);
+              const task = JSON.parse(taskString);
+              compressImageAsync(task.imageUrl)
+                .then((imagePath) => {
+                  console.log('sending completed task back to database',
+                    task.task, imagePath, task.imageId);
+                  // request
+                  //   .post('')
+                  //   .type('form')
+                  //   .send({})
+                  //   .end((err, res) => {
+                  //     console.log(res);
+                  //   });
+                  workerLoop();
+                })
+                .catch((err) => {
+                  console.err(err);
+                });
+            })
+            .catch((err) => {
               console.log(err);
-              return;
-            }
-            console.log('sending completed task back to database', task, imagePath);
-            // request
-            //   .post('')
-            //   .type('form')
-            //   .send({})
-            //   .end((err, res) => {
-            //     console.log(res);
-            //   });
-            setTimeout(workerLoop, 1000);
-          });
-        });
-        workerLoop();
-      }
-    });
+            });
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
   workerLoop();
 };
