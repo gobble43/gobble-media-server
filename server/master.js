@@ -18,6 +18,10 @@ const checkOnHTTPServer = () => {
 
     workers.httpServer.on('message', (message) => {
       console.log('master recieved message from http server', message);
+      if (!message.task || !message.imageUrl || !message.imageId) {
+        console.log('bad task');
+        return;
+      }
       if (message.task === 'compress') {
         redisClient.lpush('compress', JSON.stringify(message));
       } else if (message.task === 'upload') {
