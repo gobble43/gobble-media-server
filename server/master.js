@@ -1,6 +1,7 @@
 const cluster = require('cluster');
 
 const workers = {};
+var redisClient;
 
 const checkOnHTTPServer = () => {
   if (workers.httpServer === undefined) {
@@ -14,14 +15,15 @@ const checkOnHTTPServer = () => {
       console.log('http server died');
       delete workers.httpServer;
     });
+
     workers.httpServer.on('message', (message) => {
       console.log('master recieved message from http server', message);
       if (message.task === 'compress') {
-        workers.imageWorker.send(message);
+        redisClient.lpush('compress', JSON.stringify(message));
       } else if (message.task === 'upload') {
-
+        redisClient.lpush('upload', JSON.stringify(message));
       } else if (message.task === 'verify') {
-        
+        redisClient.lpush('verify', JSON.stringify(message));
       }
     });
   }
@@ -38,20 +40,28 @@ const checkOnImageWorker = () => {
       console.log('image worker died');
       delete workers.imageWorker;
     });
+
     workers.imageWorker.on('message', (message) => {
       console.log('master recieved message from image worker', message);
     });
   }
 };
+
 const masterJob = () => {
   console.log('master job started');
 
-  const masterLoop = () => {
-    checkOnHTTPServer();
-    checkOnImageWorker();
-  };
+  const redis = require('redis');
+  redisClient = redis.createClient();
+  redisClient.on('connect', () => {
+    console.log('connected to redis');
 
-  setInterval(masterLoop, 2000);
+    const masterLoop = () => {
+      checkOnHTTPServer();
+      checkOnImageWorker();
+    };
+
+    setInterval(masterLoop, 2000);
+  });
 };
 
 if (cluster.isMaster) {
