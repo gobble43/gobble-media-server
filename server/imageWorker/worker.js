@@ -12,7 +12,7 @@ const imageminPngquant = require('imagemin-pngquant');
 // const request = require('superagent');
 
 const compressImage = (pictureName, callback) => {
-  var imagePath;
+  let imagePath;
   if (pictureName.indexOf('openfoodfacts.org') !== -1) {
     imagePath = pictureName;
   } else {
