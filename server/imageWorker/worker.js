@@ -43,7 +43,6 @@ const workerJob = () => {
   const workerLoop = () => {
     redisClient.llenAsync('compress')
       .then((length) => {
-        console.log('length', length);
         if (length === 0) {
           setTimeout(workerLoop, 1000);
         } else {
