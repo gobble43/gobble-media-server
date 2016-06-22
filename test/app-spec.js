@@ -6,6 +6,7 @@ const path = require('path');
 // and really easy HTTP assertions.
 // See https://www.npmjs.com/package/supertest for a better reference
 const appUrl = `${process.env.PROTOCOL}${process.env.HOST}:${process.env.PORT}`;
+console.log(appUrl);
 const request = require('supertest');
 
 describe('Gobble Media Server', () => {
