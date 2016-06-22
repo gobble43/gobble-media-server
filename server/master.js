@@ -63,7 +63,7 @@ const masterJob = () => {
       checkOnHTTPServer();
       checkOnImageWorker();
     };
-
+    masterLoop();
     setInterval(masterLoop, 2000);
   });
 };
