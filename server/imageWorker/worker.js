@@ -12,7 +12,7 @@ const imageminPngquant = require('imagemin-pngquant');
 // const request = require('superagent');
 
 const compressImage = (pictureName, callback) => {
-  var imagePath;
+  let imagePath;
   if (pictureName.indexOf('openfoodfacts.org') !== -1) {
     imagePath = pictureName;
   } else {
@@ -43,7 +43,6 @@ const workerJob = () => {
   const workerLoop = () => {
     redisClient.llenAsync('compress')
       .then((length) => {
-        console.log('length', length);
         if (length === 0) {
           setTimeout(workerLoop, 1000);
         } else {

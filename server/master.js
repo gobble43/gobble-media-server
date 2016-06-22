@@ -1,7 +1,7 @@
 const cluster = require('cluster');
 
 const workers = {};
-var redisClient;
+let redisClient;
 
 const checkOnHTTPServer = () => {
   if (workers.httpServer === undefined) {
@@ -63,7 +63,7 @@ const masterJob = () => {
       checkOnHTTPServer();
       checkOnImageWorker();
     };
-
+    masterLoop();
     setInterval(masterLoop, 2000);
   });
 };

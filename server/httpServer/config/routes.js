@@ -16,7 +16,7 @@ const upload = multer({ storage });
 
 module.exports = (app) => {
   app.get('/', (req, res) => {
-    res.end('hello');
+    res.end('Hello World!');
   });
   app.post('/api/tasks', (req, res) => {
     console.log('task body', req.body);
@@ -24,6 +24,7 @@ module.exports = (app) => {
     res.end();
   });
   app.post('/api/images', upload.single('file'), (req, res) => {
+    res.statusCode = 201;
     res.end(req.file.filename);
   });
 };

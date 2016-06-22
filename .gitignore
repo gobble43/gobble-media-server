@@ -1,6 +1,5 @@
 node_modules
 .DS_Store
-dist/compressedImages
-dist/images
+
 env/development.env
 npm-debug.log

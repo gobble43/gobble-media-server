@@ -25,6 +25,7 @@ Create `env/development.env` and set environment variables. Follow `env/example.
 add any additional needed commands and instructions here
 
 ```sh
+$ redis-server
 $ npm start
 ```
 
