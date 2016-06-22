@@ -1,4 +1,3 @@
-require('babel-polyfill');
 
 // Load environment variables
 const dotenv = require('dotenv');

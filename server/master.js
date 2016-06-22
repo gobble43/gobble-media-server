@@ -1,3 +1,4 @@
+require('babel-polyfill');
 const cluster = require('cluster');
 
 const workers = {};
