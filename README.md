@@ -1,6 +1,6 @@
-[![Build Status](https://travis-ci.org/chkakaja/sentimize.svg?branch=master)](https://travis-ci.org/chkakaja/sentimize)
+[![Build Status](https://travis-ci.org/gobble43/gobble-media-server.svg?branch=master)](https://travis-ci.org/gobble43/gobble-media-server)
 
-[![Stories in Ready](https://badge.waffle.io/chkakaja/sentimize.png?label=ready&title=Ready)](https://waffle.io/chkakaja/sentimize)
+[![Stories in Ready](https://badge.waffle.io/gobble43/gobble-media-server.png?label=ready&title=Ready)](https://waffle.io/gobble43/gobble-media-server)
 
 # Microservice Name
 gobble-media-server
