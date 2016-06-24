@@ -1,7 +1,7 @@
 {
   "name": "gobble-media-server",
   "version": "1.0.0",
-  "description": "Gobble Media Server for hosting image, video and compression & upload workers",
+  "description": "[![Build Status](https://travis-ci.org/gobble43/gobble-media-server.svg?branch=master)](https://travis-ci.org/gobble43/gobble-media-server)",
   "main": "index.js",
   "scripts": {
     "test": "./node_modules/.bin/mocha --reporter spec ./test/*-spec.js",
@@ -13,7 +13,7 @@
     "url": "git+https://github.com/leoadelstein/gobble-media-server.git"
   },
   "keywords": [],
-  "author": "",
+  "author": "Leo Adelstein",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/leoadelstein/gobble-media-server/issues"
