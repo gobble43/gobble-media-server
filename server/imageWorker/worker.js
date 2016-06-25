@@ -1,8 +1,9 @@
 const path = require('path');
 
 const Promise = require('bluebird');
-
-const redis = Promise.promisifyAll(require('redis'));
+const redis = require('redis');
+Promise.promisifyAll(redis.RedisClient.prototype);
+Promise.promisifyAll(redis.Multi.prototype);
 const redisClient = redis.createClient();
 
 const imagemin = require('imagemin');
@@ -50,30 +51,27 @@ const workerJob = () => {
             .then((taskString) => {
               console.log(taskString);
               const task = JSON.parse(taskString);
-              compressImageAsync(task.imageUrl)
-                .then((imagePath) => {
-                  console.log('sending completed task back to database',
-                    task.task, imagePath, task.imageId);
-                  // request
-                  //   .post('')
-                  //   .type('form')
-                  //   .send({})
-                  //   .end((err, res) => {
-                  //     console.log(res);
-                  //   });
-                  workerLoop();
-                })
-                .catch((err) => {
-                  console.err(err);
-                });
+              return compressImageAsync(task.imageUrl);
+            })
+            .then((imagePath) => {
+              console.log('sending completed task back to database',
+                task.task, imagePath, task.imageId);
+              // request
+              //   .post('')
+              //   .type('form')
+              //   .send({})
+              //   .end((err, res) => {
+              //     console.log(res);
+              //   });
+              workerLoop();
             })
             .catch((err) => {
-              console.log(err);
+              console.error(err);
             });
         }
       })
       .catch((err) => {
-        console.log(err);
+        console.error(err);
       });
   };
   workerLoop();
