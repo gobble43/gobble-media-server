@@ -23,7 +23,7 @@ module.exports = (app) => {
     process.send(req.body);
     res.end();
   });
-  app.post('/api/images', upload.single('file'), (req, res) => {
+  app.post('/api/media', upload.single('file'), (req, res) => {
     res.statusCode = 201;
     res.end(req.file.filename);
   });
