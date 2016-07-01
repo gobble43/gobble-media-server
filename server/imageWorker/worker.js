@@ -66,6 +66,7 @@ const workerJob = () => {
               workerLoop();
             })
             .catch((err) => {
+              workerLoop();
               console.error(err);
             });
         }
