@@ -10,22 +10,30 @@ const imagemin = require('imagemin');
 const imageminMozjpeg = require('imagemin-mozjpeg');
 const imageminPngquant = require('imagemin-pngquant');
 
-// const request = require('superagent');
+const fetch = require('isomorphic-fetch');
+const dotenv = require('dotenv');
+if (process.env.NODE_ENV === 'development') {
+  dotenv.config({ path: './env/development.env' });
+} else if (process.env.NODE_ENV === 'production') {
+  dotenv.config({ path: './env/production.env' });
+}
+const gobbleDBUrl = process.env.GOBBLE_DB_URL;
+console.log(gobbleDBUrl);
 
 const compressImage = (pictureName, callback) => {
   let imagePath;
   if (pictureName.indexOf('openfoodfacts.org') !== -1) {
     imagePath = pictureName;
   } else {
-    imagePath = path.join(`${__dirname}../../../dist/images/${pictureName}`);
+    imagePath = path.resolve(__dirname, `../../dist/images/${pictureName}`);
   }
   console.log('imagePath: ', imagePath);
 
-  imagemin([imagePath], path.join(`${__dirname}../../../dist/compressedImages`),
+  imagemin([imagePath], path.resolve(__dirname, '../../dist/compressedImages'),
   { plugins: [imageminMozjpeg({ quality: 90 }),
   imageminPngquant({ quality: '65-80' })] })
   .then((files) => {
-    console.log(files);
+    console.log('compressed file', files);
     callback(null, pictureName);
   })
   .catch((err) => {
@@ -36,7 +44,7 @@ const compressImage = (pictureName, callback) => {
 
 const compressImageAsync = Promise.promisify(compressImage);
 
-const workerJob = () => {
+const compressionWorker = () => {
   process.on('message', (message) => {
     console.log('recieved message from the master', message);
   });
@@ -49,20 +57,24 @@ const workerJob = () => {
         } else {
           redisClient.rpopAsync('compress')
             .then((taskString) => {
-              console.log(taskString);
               const task = JSON.parse(taskString);
-              return compressImageAsync(task.imageUrl);
+              return Promise.all([task.imageId, compressImageAsync(task.imageUrl)]);
             })
-            .then((imagePath) => {
+            .then((results) => {
               console.log('sending completed task back to database',
-                task.task, imagePath, task.imageId);
-              // request
-              //   .post('')
-              //   .type('form')
-              //   .send({})
-              //   .end((err, res) => {
-              //     console.log(res);
-              //   });
+                 results[0], results[1]);
+              fetch(`${gobbleDBUrl}/db/compressMedia`, {
+                method: 'POST',
+                headers: {
+                  Accept: 'application/json',
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ imageId: results[0], compressedUrl: results[1] }),
+              })
+              .then()
+              .catch(err => {
+                console.err(err);
+              });
               workerLoop();
             })
             .catch((err) => {
@@ -78,5 +90,28 @@ const workerJob = () => {
   workerLoop();
 };
 
+const fetchImagesWorker = () => {
+  console.log('started fetching');
+  const workerLoop = () => {
+    fetch(`${gobbleDBUrl}/db/compressMedia`)
+    .then(response => {
+      console.log(response.status);
+      return response.json();
+    })
+    .then((body) => {
+      console.log('new images to compress: ', body);
+      for (let i = 0; i < body.length; i++) {
+        redisClient.lpushAsync('compress', JSON.stringify(body[i]));
+      }
+      setTimeout(workerLoop, 10000);
+    })
+    .catch(err => {
+      console.err(err);
+    });
+  };
+  workerLoop();
+};
+
 // start the worker
-workerJob();
+fetchImagesWorker();
+compressionWorker();
