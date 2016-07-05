@@ -29,7 +29,7 @@ const compressImage = (pictureName, callback) => {
   }
   console.log('imagePath: ', imagePath);
 
-  imagemin([imagePath], path.join(`${__dirname}../../../dist/compressedImages`),
+  imagemin([imagePath], path.resolve(__dirname, '../../dist/compressedImages'),
   { plugins: [imageminMozjpeg({ quality: 90 }),
   imageminPngquant({ quality: '65-80' })] })
   .then((files) => {
