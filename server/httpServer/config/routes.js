@@ -20,6 +20,9 @@ module.exports = (app) => {
   });
   app.post('/api/tasks', (req, res) => {
     console.log('task body', req.body);
+    if (!req.body.task) {
+      return next(new Error('Bad Request: didn\'t supply a task'));
+    }
     process.send(req.body);
     res.end();
   });

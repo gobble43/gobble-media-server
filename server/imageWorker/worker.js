@@ -1,5 +1,5 @@
 const path = require('path');
-
+const fetchUtils = require('./../httpServer/config/fetch-utils.js');
 const Promise = require('bluebird');
 const redis = require('redis');
 Promise.promisifyAll(redis.RedisClient.prototype);
@@ -27,7 +27,6 @@ const compressImage = (pictureName, callback) => {
   } else {
     imagePath = path.resolve(__dirname, `../../dist/images/${pictureName}`);
   }
-  console.log('imagePath: ', imagePath);
 
   imagemin([imagePath], path.resolve(__dirname, '../../dist/compressedImages'),
   { plugins: [imageminMozjpeg({ quality: 90 }),
@@ -73,7 +72,7 @@ const compressionWorker = () => {
               })
               .then()
               .catch(err => {
-                console.err(err);
+                console.err(`Error posting compressed images to gobble-db Error: ${err}`);
               });
               workerLoop();
             })
@@ -94,10 +93,7 @@ const fetchImagesWorker = () => {
   console.log('started fetching');
   const workerLoop = () => {
     fetch(`${gobbleDBUrl}/db/compressMedia`)
-    .then(response => {
-      console.log(response.status);
-      return response.json();
-    })
+    .then(response => fetchUtils.checkStatus(response))
     .then((body) => {
       console.log('new images to compress: ', body);
       for (let i = 0; i < body.length; i++) {
@@ -106,12 +102,13 @@ const fetchImagesWorker = () => {
       setTimeout(workerLoop, 10000);
     })
     .catch(err => {
-      console.err(err);
+      console.err(`Error fetching uncompressed images from gobble-db Error: ${err}`);
     });
   };
   workerLoop();
 };
 
-// start the worker
+// start fetching images for the worker
 fetchImagesWorker();
+// start the compression worker
 compressionWorker();
